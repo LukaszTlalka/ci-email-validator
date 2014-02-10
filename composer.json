@@ -1,0 +1,21 @@
+{
+    "name": "lukasz-tlalka/ci-email-validator",
+    "description": "PHP email validation class",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Łukasz Tlałka",
+            "email": "lukasz.tlalka@netblink.net"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+	   "php": ">=5.3.0",
+	   "lib-curl": "*"
+    },
+	"autoload": {
+	  "classmap": [
+	    "src"
+	  ]
+	}
+}
