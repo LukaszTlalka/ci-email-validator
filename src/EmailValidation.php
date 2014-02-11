@@ -362,6 +362,3 @@
      return array('errorCode' => 1);
    }
  }
-
- //$emObj = new EmailValidation();
- //echo $emObj->validateAccountOnMailServer("lukasz.tlalka@netblink.net");

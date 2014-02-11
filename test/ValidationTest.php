@@ -17,8 +17,9 @@
       
       $this->assertEquals(array('errorCode' => 5), $this->emailValidation->validate("random@netblink.net") );
 
-      $this->assertEquals(array('errorCode' => 6), $this->emailValidation->validate("lukasz.tlalka@mail-temporaire.fr") );
-      
+      // tested in testDisposableEmail method
+      // $this->assertEquals(array('errorCode' => 6), $this->emailValidation->validate("lukasz.tlalka@mail-temporaire.fr") );
+
       $this->assertEquals(array('errorCode' => 1), $this->emailValidation->validate("lukasz.tlalka@netblink.net") );
     }
 
