@@ -21,6 +21,22 @@
    private $dataDirPath = null;
 
    /**
+    * useAPC - enable apc cache for deafilter.com
+    *
+    * @var string
+    * @access private
+   **/
+   private $useAPC = false;
+ 
+   /**
+    * keyAPC - key used for storing deafilter.com web service result
+    *
+    * @var string
+    * @access private
+   **/
+   private $keyAPC = "dealfilter_%domain%";
+
+   /**
     * socketTimeout - socket timeout - checking if the account on the mail server exists
     *
     * @see function validateAccountOnMailServer
@@ -113,6 +129,9 @@
      $this->setDataDirPath($dataDirPath);
      $this->setMailServerTimeout($socketTimeout);
      $this->setDeaFilterKey($deaFilterKey);
+
+     if (function_exists("apc_store"))
+       $this->useAPC = true;
    }
 
    /**
@@ -190,6 +209,8 @@
      $_hostname = explode("@", $email);
      $_hostname = $_hostname[1];
 
+     $keyAPC = str_replace("%domain%", $_hostname, $this->keyAPC);
+
      $dataDispPath = $this->dataDirPath.DIRECTORY_SEPARATOR."disposable_email.php";
      $dataIgnorePath = $this->dataDirPath.DIRECTORY_SEPARATOR."disposable_email_ignore.php";
 
@@ -214,6 +235,13 @@
      if (array_search ( $_hostname, (array)self::$cache[ $dataDispPath ]))
        return false;
 
+     if ($this->useAPC)
+     {
+   	$apcOut = apc_fetch($keyAPC, $exists);
+
+	if ($exists)
+  	  return $apcOut;
+     }
 
      $url = "http://www.deafilter.com/classes/DeaFilter.php?mail=".urlencode($email)."&key=".$this->deaFilterKey;
      $curl = curl_init();
@@ -224,8 +252,13 @@
 
      $result = curl_exec($curl);
      $data = json_decode($result);
+     
+     $val = @$data->result;
 
-     if (@$data->result == 'ko')
+     if ($this->useAPC && ($val == 'ok' || $val == 'ko'))
+	apc_store($keyAPC, $val == 'ok'?1:0);
+
+     if ($val == 'ko')
        return false;
 
      return true;
