@@ -236,7 +236,7 @@
        stream_socket_sendto($fp, $query . "\r\n");
 
        do
-	   {
+       {
            $reply = stream_get_line($fp, 1024, "\r\n");
            $status = stream_get_meta_data($fp);
        }
@@ -263,6 +263,9 @@
    **/
    public function validateAccountOnMailServer($email)
    {
+     if (PHP_VERSION_ID == "50310")
+       return true;
+
      $_hostname = explode("@", $email);
      $_hostname = $_hostname[1];
 
@@ -310,10 +313,10 @@
          fclose($fp);
 
          if ($code == '250' || $code == '450' || $code == '451' || $code == '452')
-   		   return true;
+            return true;
      }
 
-	 return false;
+     return false;
    }
 
    /**
@@ -347,7 +350,21 @@
        $validDomainEmail = $this->validateDomainSpelling($email);
 
        if ($validDomainEmail != $email)
+       {
+         $validateOptionsHelp = $this->validateOptions;
+
+         // protect from recursion
+         $key = array_search("DomainSpelling", $this->validateOptions);
+         unset($this->validateOptions[$key]);
+
+         $newValidation = $this->validate($validDomainEmail);
+         $this->validateOptions = $validateOptionsHelp;
+
+         if ($newValidation['errorCode'] != 1)
+           return $newValidation;
+
          return array('errorCode' => 3, 'validatedEmail' => $validDomainEmail);
+       }
      }
 
      if (in_array("MX", $this->validateOptions) && !$this->validateMX($email))

@@ -1,4 +1,5 @@
 <?
+
   class ValidationTest extends PHPUnit_Framework_TestCase
   {
     public function setUp()
@@ -14,8 +15,11 @@
                                 'validatedEmail' => 'lukasz.tlalk@gmail.com'), $this->emailValidation->validate("lukasz.tlalk@gmial.com") );
 
       $this->assertEquals(array('errorCode' => 4), $this->emailValidation->validate("lukasz.tlalk@justrand123dd.com") );
-      
-      $this->assertEquals(array('errorCode' => 5), $this->emailValidation->validate("random@netblink.net") );
+  
+      if (PHP_VERSION_ID == "50310")
+        echo "\n[Info] Method validateAccountOnMailServer disabled on this PHP verison\n";
+      else
+        $this->assertEquals(array('errorCode' => 5), $this->emailValidation->validate("random@netblink.net") );
 
       // tested in testDisposableEmail method
       // $this->assertEquals(array('errorCode' => 6), $this->emailValidation->validate("lukasz.tlalka@mail-temporaire.fr") );
@@ -49,6 +53,12 @@
 
     public function testIfAccountExistsOnTheMailServer()
     {
+      if (PHP_VERSION_ID == "50310")
+      {
+        echo "\n[Info] Method validateAccountOnMailServer disabled on this PHP verison\n";
+        return;
+      }
+
       $this->assertEquals(true, $this->emailValidation->validateAccountOnMailServer("lukasz.tlalka@netblink.net") );
       $this->assertEquals(false, $this->emailValidation->validateAccountOnMailServer("lukasz.tlalka2@netblink.net") );
     }
