@@ -272,6 +272,9 @@
        {
            $reply = stream_get_line($fp, 1024, "\r\n");
            $status = stream_get_meta_data($fp);
+           
+           if ($status['eof'] == 1)
+             break;
        }
        while (($reply[3] != ' ') && ($status['timed_out'] === FALSE));
 
@@ -322,6 +325,9 @@
          do {
              $reply = stream_get_line($fp, 1024, "\r\n");
              $status = stream_get_meta_data($fp);
+
+             if ($status['eof'] == 1)
+               break;
          } while (($reply[3] != ' ') && ($status['timed_out'] === FALSE));
 
          preg_match('/^(?<code>[0-9]{3}) (.*)$/ims', $reply, $matches);
